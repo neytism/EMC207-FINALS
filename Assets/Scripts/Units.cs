@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(CapsuleCollider))]
 public abstract class Units : MonoBehaviour
 {
     public event Action OnDeathEvent;
@@ -145,7 +146,8 @@ public abstract class Units : MonoBehaviour
         Dummy,
         Archer,
         Sword,
-        Healer
+        Healer,
+        Mutant
     }
 
     public enum Team

@@ -489,10 +489,10 @@ InputManager:
     m_Name: UpDown
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: e
-    positiveButton: q
-    altNegativeButton: e
-    altPositiveButton: q
+    negativeButton: q
+    positiveButton: e
+    altNegativeButton: q
+    altPositiveButton: e
     gravity: 1000
     dead: 0.001
     sensitivity: 1000

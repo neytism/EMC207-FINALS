@@ -1,0 +1,65 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraController : MonoBehaviour
+{
+   
+    public float moveSpeed = 10f;
+    public float rotationSpeed = 2f;
+
+    public Transform drone;
+    
+    private float xRot;
+    private float yRot;
+
+    private bool _canControl = true;
+
+    void Update()
+    {
+        CursorHandler();
+        if (!_canControl) return;
+        
+        // Translation
+        Vector3 translation = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("UpDown"), Input.GetAxis("Vertical"));
+        translation.Normalize(); // Normalize diagonal movement
+        transform.Translate(translation * (moveSpeed * Time.deltaTime));
+
+        // Rotation
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+
+        xRot += mouseX * rotationSpeed;
+        yRot += mouseY * rotationSpeed;
+
+        if (yRot > 360 || yRot < -360) yRot = 0;
+        if (xRot > 360 || xRot < -360) xRot = 0;
+        
+        transform.localRotation = Quaternion.Euler(-yRot, xRot, 0f);
+
+        UnnecessaryBullshit();
+
+    }
+    
+    private void CursorHandler()
+    {
+        if (Input.GetKey(KeyCode.LeftAlt))
+        {
+            _canControl = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            _canControl = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
+    private void UnnecessaryBullshit()
+    {
+        drone.rotation = Quaternion.Euler(transform.rotation.x * -1, transform.rotation.y * -1, transform.rotation.z * -1);
+    }
+
+}

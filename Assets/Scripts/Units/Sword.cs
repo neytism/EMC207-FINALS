@@ -11,11 +11,12 @@ public class Sword : Units
     
     public override void Attack()
     {
+        if (target == null) return;
         float distanceToPlayer = Vector3.Distance(transform.position, target.transform.position);
         
         if (distanceToPlayer <= attackRange)
         {
-            target.Hurt(damage);
+            target.Hurt(CalculateDamage(), this);
         }
     }
 
@@ -24,7 +25,7 @@ public class Sword : Units
         _slash.Play();
     }
 
-    public override void Hurt(float damageTaken)
+    public override void Hurt(float damageTaken, Units killer)
     {
         if (!isAlive) return;
         
@@ -34,6 +35,7 @@ public class Sword : Units
 
         if (hitPoints <= 0)
         {
+            killer.IncreaseKillCount();
             Death();
         }
     }

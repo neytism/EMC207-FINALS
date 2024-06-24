@@ -15,13 +15,14 @@ public class Archer : Units
         GameObject obj = ObjectPool.Instance.PoolObject(_arrowPrefab, _firePoint.position);
         Projectile projectile = obj.GetComponent<Projectile>();
         projectile.SetTargetTeam = targetTeam;
-        projectile.SetDamage = damage;
+        projectile.SetDamage = CalculateDamage();
         projectile.SetSpeed = _arrowSpeed;
         projectile.SetDirection = transform.forward;
+        projectile.SetUnit = this;
         obj.SetActive(true);
     }
 
-    public override void Hurt(float damageTaken)
+     public override void Hurt(float damageTaken, Units killer)
     {
         if (!isAlive) return;
         
@@ -31,6 +32,7 @@ public class Archer : Units
 
         if (hitPoints <= 0)
         {
+            killer.IncreaseKillCount();
             Death();
         }
     }

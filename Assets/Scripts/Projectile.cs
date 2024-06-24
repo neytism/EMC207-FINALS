@@ -7,12 +7,17 @@ public class Projectile : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _hitEffect;
     
+    private Units _shooter;
     private float _damage;
     private float _speed;
     private Vector3 _direction;
     private Units.Team _targetTeam;
     private Collider _col;
 
+    public Units SetUnit
+    {
+        set => _shooter = value;
+    }
     public float SetDamage
     {
         set => _damage = value;
@@ -57,7 +62,7 @@ public class Projectile : MonoBehaviour
         {
             if (unit.team == _targetTeam)
             {
-                unit.Hurt(_damage);
+                unit.Hurt(_damage, _shooter);
                 StopCoroutine(LifeTime());
                 StartCoroutine(OnHit());
                 

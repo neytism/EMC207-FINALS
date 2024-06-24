@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class Units : MonoBehaviour
 {
     public event Action OnDeathEvent;
+    public static event Action OnDeathStaticEvent;
     
     public UnitType type = UnitType.Archer;
     
@@ -16,7 +19,10 @@ public abstract class Units : MonoBehaviour
     public float hitPoints = 10;
     public int speed = 5;
     public float attackRate = 1f;
+    public float healRate = 0f;
     public float damage = 1f;
+    public float critChance = 0.1f;
+    public float critMultiplier = 2f;
     public float attackRange = 1f;
     public float visionRange = 5f;
     public bool isAlive = true;
@@ -31,9 +37,12 @@ public abstract class Units : MonoBehaviour
     
     public Animator animator;
     public GameObject healthCanvas;
+    public ParticleSystem healAura;
+
+    public int killCount;
     
     public abstract void Attack();
-    public abstract void Hurt(float damageTaken);
+    public abstract void Hurt(float damageTaken, Units killer);
     public abstract void Death();
 
     private void Awake()
@@ -48,21 +57,26 @@ public abstract class Units : MonoBehaviour
 
     private void Start()
     {
-        GetClosestEnemy();
+        GetClosestUnit();
     }
-    
-    public void GetClosestEnemy()
+
+    private void GetClosestUnit()
     {
         Units nearestUnit = null;
         float minDist = Mathf.Infinity;
         Vector3 currentPos = transform.position;
-        foreach (Units u in GameManager.Instance.AllUnits)
+        foreach (Units target in GameManager.Instance.AllUnits)
         {
-            if (u.team == team || !u.isAlive) continue;
-            float dist = Vector3.Distance(u.transform.position, currentPos);
+            if (!target.isAlive) continue; 
+            if (target.team == team) continue;
+            
+            // if (isLookForEnemy) if (target.team == team) continue; //skip if kakampi, look for kalaban
+            // if (!isLookForEnemy) if (target.team != team) continue; //skip if kalaban, look for kakampi
+            
+            float dist = Vector3.Distance(target.transform.position, currentPos);
             if (dist < minDist)
             {
-                nearestUnit = u;
+                nearestUnit = target;
                 minDist = dist;
             }
         }
@@ -83,13 +97,47 @@ public abstract class Units : MonoBehaviour
     public void InvokeDeathEvent()
     {
         OnDeathEvent?.Invoke();
+        OnDeathStaticEvent?.Invoke();
     }
 
     private void OnTargetDeath()
     {
         target.OnDeathEvent -= OnTargetDeath;
-        GetClosestEnemy();
+        GetClosestUnit();
         
+    }
+    
+    public void Heal(float healTaken)
+    {
+        if (!isAlive) return;
+        
+        hitPoints += healTaken;
+        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
+        
+        healAura.Play();
+        if (hitPoints >= maxHitPoints)
+        {
+            hitPoints = maxHitPoints;
+        }
+    }
+    
+    public float CalculateDamage()
+    {
+        float damageToApply = damage;
+
+        if (Random.Range(0f, 1f) <= critChance)
+        {
+            float critMultiplierChance = Random.Range(0.05f, 1f);
+            float critMultiplierToApply = critMultiplier * critMultiplierChance;
+            damageToApply *= critMultiplierToApply;
+        }
+
+        return damageToApply;
+    }
+
+    public void IncreaseKillCount()
+    {
+        killCount++;
     }
 
     public enum UnitType

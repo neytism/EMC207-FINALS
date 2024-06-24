@@ -10,7 +10,7 @@ public class AttackState : StateMachineBehaviour
     private const string IsChase = "IsChase";
     private const string IsAttack = "IsAttack";
 
-    private float _time;
+    private float _attackTime;
     
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -37,14 +37,14 @@ public class AttackState : StateMachineBehaviour
         
         unit.transform.forward = (target - position).normalized;
 
-        if (unit.type == Units.UnitType.Archer)
+        if (unit.type == Units.UnitType.Archer || unit.type == Units.UnitType.Healer)
         {
-            _time += Time.deltaTime;
-            if (_time >= (unit.attackRate + Random.Range(0f, 2f)))
+            _attackTime += Time.deltaTime;
+            if (_attackTime >= (unit.attackRate + Random.Range(0f, 2f)))
             {
                 animator.SetTrigger("Shoot");
                 //unit.GetClosestEnemy();
-                _time = 0;
+                _attackTime = 0;
             }
         }
 

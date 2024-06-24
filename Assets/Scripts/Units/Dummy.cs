@@ -10,7 +10,7 @@ public class Dummy : Units
         throw new System.NotImplementedException();
     }
 
-    public override void Hurt(float damageTaken)
+    public override void Hurt(float damageTaken, Units killer)
     {
         if (!isAlive) return;
         
@@ -20,6 +20,7 @@ public class Dummy : Units
 
         if (hitPoints <= 0)
         {
+            killer.IncreaseKillCount();
            Death();
         }
         else

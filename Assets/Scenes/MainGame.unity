@@ -12006,6 +12006,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36d5c0b38c36c4b4e8e31df7f5187d75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialPosition: {x: -42.05, y: 19.61, z: 0}
+  initialRotation: {x: 25.550777, y: 90, z: 0}
   moveSpeed: 10
   rotationSpeed: 2
   drone: {fileID: 1977507877}
@@ -21131,6 +21133,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mutant (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2896203754540156896, guid: 4d37ca7ee9b97754f85cbfde82cc907f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6890140000406529371, guid: 4d37ca7ee9b97754f85cbfde82cc907f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -21221,6 +21228,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mutant
+      objectReference: {fileID: 0}
+    - target: {fileID: 2896203754540156896, guid: 4d37ca7ee9b97754f85cbfde82cc907f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6890140000406529371, guid: 4d37ca7ee9b97754f85cbfde82cc907f,
         type: 3}
@@ -41113,6 +41125,11 @@ PrefabInstance:
         type: 3}
       propertyPath: damage
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798488554434622819, guid: c64edb78a26bea14d97a48f6814839ac,
+        type: 3}
+      propertyPath: immortalDebug
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5970050043825141500, guid: c64edb78a26bea14d97a48f6814839ac,
         type: 3}

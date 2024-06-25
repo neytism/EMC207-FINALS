@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-   
+
+    public Vector3 initialPosition;
+    public Vector3 initialRotation;
     public float moveSpeed = 10f;
     public float rotationSpeed = 2f;
 
@@ -14,6 +17,12 @@ public class CameraController : MonoBehaviour
     private float yRot;
 
     private bool _canControl = true;
+
+    private void Start()
+    {
+        transform.position = initialPosition;
+        transform.rotation = Quaternion.Euler(initialRotation);
+    }
 
     void Update()
     {

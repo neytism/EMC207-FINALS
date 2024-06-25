@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class AttackState : StateMachineBehaviour
 {
+    [SerializeField] private float rotationSpeed = 5f;
+    
     private Units unit;
 
     private const string IsChase = "IsChase";
@@ -19,7 +21,7 @@ public class AttackState : StateMachineBehaviour
     }
     
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if(!unit.isAlive) return;
         
@@ -35,7 +37,7 @@ public class AttackState : StateMachineBehaviour
         
         float distanceToPlayer = Vector3.Distance(position, target);
         
-        unit.transform.forward = (target - position).normalized;
+        unit.transform.forward = Vector3.Lerp(unit.transform.forward, (target - position).normalized, Time.deltaTime * rotationSpeed);
 
         if (unit.type == Units.UnitType.Archer || unit.type == Units.UnitType.Healer)
         {

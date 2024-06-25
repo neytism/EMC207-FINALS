@@ -7,9 +7,11 @@ using UnityEngine.UI;
 public class Mutant : Units
 {
     //TODO: fix attack rate 
-    
+
+    private float attackTime;
     public override void Attack()
     {
+        if(!isAlive) return;
         if (target == null) return;
     
         foreach (Units unit in GameManager.Instance.AllUnits)

@@ -6,7 +6,9 @@ TagManager:
   tags:
   - Arrow
   - Unit
-  - Magic_1
+  - MagicHero
+  - MagicHeal
+  - MagicRival
   layers:
   - Default
   - TransparentFX

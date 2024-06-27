@@ -8,19 +8,19 @@ public class Projectile : MonoBehaviour
     [SerializeField] private ParticleSystem _hitEffect;
     
     private Units _shooter;
-    private float _damage;
+    private float _valueEffect;
     private float _speed;
     private Vector3 _direction;
-    private Units.Team _targetTeam;
     private Collider _col;
+    private Rigidbody _rb;
 
     public Units SetUnit
     {
         set => _shooter = value;
     }
-    public float SetDamage
+    public float SetValueEffect
     {
-        set => _damage = value;
+        set => _valueEffect = value;
     }
     
     public float SetSpeed
@@ -32,26 +32,26 @@ public class Projectile : MonoBehaviour
     {
         set => _direction = value;
     }
-    
-    public Units.Team SetTargetTeam
-    {
-        set => _targetTeam = value;
-    }
 
     private void Awake()
     {
         _col = GetComponent<Collider>();
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void OnEnable()
     {
         _col.enabled = true;
+        GetComponent<Collider>().enabled = true;
         StartCoroutine(LifeTime());
     }
 
     private void Update()
     {
-        transform.position += _direction * (_speed * Time.deltaTime);
+        //transform.position += _direction * (_speed * Time.deltaTime);
+        
+        Vector3 desiredMovement = _direction * (_speed * Time.deltaTime);
+        _rb.MovePosition(_rb.position + desiredMovement);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -60,9 +60,10 @@ public class Projectile : MonoBehaviour
         
         if (unit != null)
         {
-            if (unit.team == _targetTeam)
+            if (unit.team == _shooter.targetTeam)
             {
-                unit.Hurt(_damage, _shooter);
+                unit.Hurt(_valueEffect, _shooter);
+                GetComponent<Collider>().enabled = false;
                 StopCoroutine(LifeTime());
                 StartCoroutine(OnHit());
                 

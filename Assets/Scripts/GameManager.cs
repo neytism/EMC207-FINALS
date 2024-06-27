@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -9,7 +11,8 @@ public class GameManager : MonoBehaviour
     #region Instance
 
     private static GameManager _instance;
-    public static  GameManager Instance
+
+    public static GameManager Instance
     {
         get { return _instance; }
     }
@@ -30,6 +33,12 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    public static event Action OnStartBattleEvent;
+
+    [SerializeField] private TextMeshProUGUI _winnerText;
+    [SerializeField] private RectTransform _topBar;
+    [SerializeField] private RectTransform _bottomBar;
+
     private Units[] _allUnits;
 
     public Units[] AllUnits => _allUnits;
@@ -37,7 +46,12 @@ public class GameManager : MonoBehaviour
     private Units.Team _teamWinner;
 
     public bool battleDone = false;
-    
+
+    private void Start()
+    {
+        OnStartBattleEvent?.Invoke();
+    }
+
 
     private void OnEnable()
     {
@@ -73,6 +87,7 @@ public class GameManager : MonoBehaviour
         {
             battleDone = true;
             _teamWinner = Units.Team.TeamB;
+            _winnerText.text = "RIVALS WINS";
             Debug.Log("Winner: " + _teamWinner);
         }
         
@@ -80,7 +95,24 @@ public class GameManager : MonoBehaviour
         {
             battleDone = true;
             _teamWinner = Units.Team.TeamA;
+            _winnerText.text = "HEROES WINS";
             Debug.Log("Winner: " + _teamWinner);
+        }
+
+        if (battleDone)
+        {
+            foreach (var unit in _allUnits)
+            {
+                if (unit.isAlive)
+                {
+                    unit.animator.CrossFade("Idle", 0.2f);
+                    unit.agent.speed = 0;
+                }
+            }
+
+            _topBar.DOScaleY(1, 2);
+            _bottomBar.DOScaleY(1, 2);
+            _winnerText.DOFade(1, 2);
         }
     }
 }

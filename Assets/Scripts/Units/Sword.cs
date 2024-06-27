@@ -20,35 +20,24 @@ public class Sword : Units
         }
     }
 
+    public override void OnHurt()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void OnDeath()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public void PlaySlash()
     {
         _slash.Play();
     }
-
-    public override void Hurt(float damageTaken, Units killer)
+    
+    public override void OnStartBattle()
     {
-        if (!isAlive) return;
-        
-        healthCanvas.SetActive(true);
-        if (!immortalDebug) hitPoints -= damageTaken;
-        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
-
-        if (hitPoints <= 0)
-        {
-            killer.IncreaseKillCount();
-            Death();
-        }
-    }
-
-    public override void Death()
-    {
-        isAlive = false;
-        InvokeDeathEvent();
-        animator.SetTrigger("Death");
-        healthCanvas.SetActive(false);
-        agent.speed = 0;
-        GetComponent<Collider>().enabled = false;
-        GetComponent<NavMeshAgent>().enabled = false;
        
     }
+    
 }

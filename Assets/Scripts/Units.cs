@@ -26,6 +26,8 @@ public abstract class Units : MonoBehaviour
     public float critMultiplier = 2f;
     public float attackRange = 1f;
     public float visionRange = 5f;
+    public int lowHealthThreshHold = 15;
+    public bool isLowHealth = false;
     public bool isAlive = true;
     public bool immortalDebug;
 
@@ -37,14 +39,19 @@ public abstract class Units : MonoBehaviour
     [HideInInspector] public Team targetTeam;
     
     public Animator animator;
+    public AnimatorEventReceiver receiver;
     public GameObject healthCanvas;
     public ParticleSystem healAura;
 
     public int killCount;
     
+    public abstract void OnStartBattle();
+    
     public abstract void Attack();
-    public abstract void Hurt(float damageTaken, Units killer);
-    public abstract void Death();
+
+    public abstract void OnHurt();
+    
+    public abstract void OnDeath();
 
     private void Awake()
     {
@@ -56,16 +63,45 @@ public abstract class Units : MonoBehaviour
         hitPoints = maxHitPoints;
     }
 
-    private void Start()
+    public void Hurt(float damageTaken, Units killer)
     {
-        GetClosestUnit();
-    }
+        if (!isAlive) return;
+        
+        healthCanvas.SetActive(true);
+        if (!immortalDebug) hitPoints -= damageTaken;
+        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
 
-    private void GetClosestUnit()
+        OnHurt();
+        
+        GetClosestEnemyUnit();
+        isLowHealth = CheckHealth();
+
+        if (hitPoints <= 0)
+        {
+            killer.IncreaseKillCount();
+            Death();
+        }
+    }
+    
+    public void Death()
     {
+        OnDeath();
+        isAlive = false;
+        InvokeDeathEvent();
+        healthCanvas.SetActive(false);
+        agent.speed = 0;
+        GetComponent<Collider>().enabled = false;
+        GetComponent<NavMeshAgent>().enabled = false;
+    }
+    
+    public void GetClosestEnemyUnit()
+    {
+        if (target != null) target.OnDeathEvent -= OnTargetDeath;
+        
         Units nearestUnit = null;
         float minDist = Mathf.Infinity;
         Vector3 currentPos = transform.position;
+        
         foreach (Units target in GameManager.Instance.AllUnits)
         {
             if (!target.isAlive) continue; 
@@ -81,11 +117,58 @@ public abstract class Units : MonoBehaviour
                 minDist = dist;
             }
         }
-
+    
         target = nearestUnit;
         
         if (target != null) target.OnDeathEvent += OnTargetDeath;
     }
+    
+    // public void GetClosestEnemyUnit(List<UnitType> targetTypes)
+    // {
+    //     Units nearestUnit = null;
+    //     float minDist = Mathf.Infinity;
+    //     Vector3 currentPos = transform.position;
+    //
+    //     foreach (Units target in GameManager.Instance.AllUnits)
+    //     {
+    //         if (!target.isAlive) continue;
+    //         if (target.team == team) continue;
+    //
+    //         // Check if the target's unit type matches the specified target types
+    //         bool isTargetTypeMatch = targetTypes.Count == 0 || targetTypes.Contains(target.type);
+    //         if (!isTargetTypeMatch) continue;
+    //
+    //         float dist = Vector3.Distance(target.transform.position, currentPos);
+    //         if (dist < minDist)
+    //         {
+    //             nearestUnit = target;
+    //             minDist = dist;
+    //         }
+    //     }
+    //
+    //     if (nearestUnit == null)
+    //     {
+    //         foreach (Units target in GameManager.Instance.AllUnits)
+    //         {
+    //             if (!target.isAlive) continue; 
+    //             if (target.team == team) continue;
+    //             
+    //             // if (isLookForEnemy) if (target.team == team) continue; //skip if kakampi, look for kalaban
+    //             // if (!isLookForEnemy) if (target.team != team) continue; //skip if kalaban, look for kakampi
+    //             
+    //             float dist = Vector3.Distance(target.transform.position, currentPos);
+    //             if (dist < minDist)
+    //             {
+    //                 nearestUnit = target;
+    //                 minDist = dist;
+    //             }
+    //         }
+    //     }
+    //
+    //     target = nearestUnit;
+    //
+    //     if (target != null) target.OnDeathEvent += OnTargetDeath;
+    // }
 
     private void OnDrawGizmosSelected()
     {
@@ -103,19 +186,22 @@ public abstract class Units : MonoBehaviour
 
     private void OnTargetDeath()
     {
-        target.OnDeathEvent -= OnTargetDeath;
-        GetClosestUnit();
-        
+        if(target != null) target.OnDeathEvent -= OnTargetDeath;
+        GetClosestEnemyUnit();
     }
     
-    public void Heal(float healTaken)
+    public void Heal(float healPercentage)
     {
         if (!isAlive) return;
-        
-        hitPoints += healTaken;
+    
+        float healAmount = maxHitPoints * (healPercentage / 100f);
+        hitPoints += healAmount;
         healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
-        
+    
         healAura.Play();
+
+        isLowHealth = CheckHealth();
+    
         if (hitPoints >= maxHitPoints)
         {
             hitPoints = maxHitPoints;
@@ -140,14 +226,26 @@ public abstract class Units : MonoBehaviour
     {
         killCount++;
     }
+    
+    protected void CrossFadeAnimation(string stateName, float duration)
+    {
+        animator.CrossFade(stateName, duration);
+    }
 
+    protected bool CheckHealth()
+    {
+        float hpPercentage = (hitPoints / maxHitPoints) * 100;
+        return hpPercentage < lowHealthThreshHold;
+    }
+    
     public enum UnitType
     {
-        Dummy,
-        Archer,
-        Sword,
-        Healer,
-        Mutant
+        Dummy, // no actions
+        Archer, // ranged
+        Clubber, // melee
+        Healer, // can damage and heal
+        Tank, // high hp can damage multiple enemies at once
+        Sorcerer, //crowd control, multiple enemies
     }
 
     public enum Team
@@ -155,4 +253,5 @@ public abstract class Units : MonoBehaviour
         TeamA,
         TeamB
     }
+    
 }

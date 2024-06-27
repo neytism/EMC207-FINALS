@@ -10,31 +10,18 @@ public class Dummy : Units
         throw new System.NotImplementedException();
     }
 
-    public override void Hurt(float damageTaken, Units killer)
+    public override void OnHurt()
     {
-        if (!isAlive) return;
-        
-        healthCanvas.SetActive(true);
-        hitPoints -= damageTaken;
-        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
-
-        if (hitPoints <= 0)
-        {
-            killer.IncreaseKillCount();
-           Death();
-        }
-        else
-        {
-            animator.SetTrigger("Hit");
-        }
+        throw new System.NotImplementedException();
     }
 
-    public override void Death()
+    public override void OnDeath()
     {
-        isAlive = false;
-        InvokeDeathEvent();
-        animator.SetTrigger("Death");
-        healthCanvas.SetActive(false);
-        GetComponent<Collider>().enabled = false;
+        throw new System.NotImplementedException();
+    }
+    
+    public override void OnStartBattle()
+    {
+       
     }
 }

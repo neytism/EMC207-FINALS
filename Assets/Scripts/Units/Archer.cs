@@ -14,38 +14,25 @@ public class Archer : Units
     {
         GameObject obj = ObjectPool.Instance.PoolObject(_arrowPrefab, _firePoint.position);
         Projectile projectile = obj.GetComponent<Projectile>();
-        projectile.SetTargetTeam = targetTeam;
-        projectile.SetDamage = CalculateDamage();
+        projectile.SetValueEffect = CalculateDamage();
         projectile.SetSpeed = _arrowSpeed;
         projectile.SetDirection = transform.forward;
         projectile.SetUnit = this;
         obj.SetActive(true);
     }
-
-     public override void Hurt(float damageTaken, Units killer)
+    
+    public override void OnStartBattle()
     {
-        if (!isAlive) return;
-        
-        healthCanvas.SetActive(true);
-        if (!immortalDebug) hitPoints -= damageTaken;
-        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
-
-        if (hitPoints <= 0)
-        {
-            killer.IncreaseKillCount();
-            Death();
-        }
+       
     }
-
-    public override void Death()
+    
+    public override void OnDeath()
     {
-        isAlive = false;
-        InvokeDeathEvent();
-        animator.SetTrigger("Death");
-        healthCanvas.SetActive(false);
-        agent.speed = 0;
-        GetComponent<Collider>().enabled = false;
-        GetComponent<NavMeshAgent>().enabled = false;
+        
+    }
+    
+    public override void OnHurt()
+    {
         
     }
 }

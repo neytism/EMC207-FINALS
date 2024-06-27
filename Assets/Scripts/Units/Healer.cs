@@ -13,7 +13,7 @@ public class Healer : Units
     [SerializeField] private float _arrowSpeed;
     
     [SerializeField] private ParticleSystem _healCircle;
-    [SerializeField] private float _healValue = 5f;
+    [SerializeField] private float _healPercentage = 5f;
     
     private float _healTime;
     private int _prevKillCount = 0;
@@ -33,9 +33,12 @@ public class Healer : Units
                 animator.SetTrigger("Heal");
                 agent.speed = 0;
             }
-           
-
         } 
+    }
+    
+    public override void OnStartBattle()
+    {
+       
     }
 
     public override void Attack()
@@ -48,7 +51,7 @@ public class Healer : Units
                 
                 if (dist <= visionRange)
                 {
-                    unit.Heal(_healValue);
+                    unit.Heal(_healPercentage);
                 }
             }
         }
@@ -58,8 +61,7 @@ public class Healer : Units
     {
         GameObject obj = ObjectPool.Instance.PoolObject(_projectilePrefab, _firePoint.position);
         Projectile projectile = obj.GetComponent<Projectile>();
-        projectile.SetTargetTeam = targetTeam;
-        projectile.SetDamage = CalculateDamage();
+        projectile.SetValueEffect = CalculateDamage();
         projectile.SetSpeed = _arrowSpeed;
         projectile.SetDirection = transform.forward;
         projectile.SetUnit = this;
@@ -72,33 +74,10 @@ public class Healer : Units
         _healCircle.Play();
     }
 
-    public override void Hurt(float damageTaken, Units killer)
+    public override void OnDeath()
     {
-        if (!isAlive) return;
         
-        healthCanvas.SetActive(true);
-        if (!immortalDebug) hitPoints -= damageTaken;
-        healthCanvas.transform.GetChild(1).GetComponent<Image>().fillAmount = hitPoints / maxHitPoints;
-
-        if (hitPoints <= 0)
-        {
-            killer.IncreaseKillCount();
-            Death();
-        }
     }
-
-    public override void Death()
-    {
-        isAlive = false;
-        InvokeDeathEvent();
-        animator.SetTrigger("Death");
-        healthCanvas.SetActive(false);
-        agent.speed = 0;
-        GetComponent<Collider>().enabled = false;
-        GetComponent<NavMeshAgent>().enabled = false;
-       
-    }
-    
     public bool IsTeamMateNear()
     {
         Units nearestUnit = null;
@@ -119,5 +98,10 @@ public class Healer : Units
         }
 
         return nearestUnit;
+    }
+    
+    public override void OnHurt()
+    {
+        
     }
 }

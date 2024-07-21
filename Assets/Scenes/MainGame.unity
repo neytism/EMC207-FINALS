@@ -13124,6 +13124,7 @@ MonoBehaviour:
   moveSpeed: 10
   rotationSpeed: 2
   drone: {fileID: 1977507877}
+  _slowMotionFactor: 0.15
 --- !u!4 &343160257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2605831648398421537, guid: d065ce7672da9864e9c726b8e15dbd37,

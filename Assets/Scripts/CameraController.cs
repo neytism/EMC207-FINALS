@@ -13,10 +13,14 @@ public class CameraController : MonoBehaviour
 
     public Transform drone;
     
+    [SerializeField] private float _slowMotionFactor = 0.5f;
+    
     private float xRot;
     private float yRot;
 
     private bool _canControl = true;
+
+    
 
     private void Start()
     {
@@ -48,6 +52,8 @@ public class CameraController : MonoBehaviour
 
         UnnecessaryBullshit();
 
+        SlowMotion();
+
     }
     
     private void CursorHandler()
@@ -69,6 +75,20 @@ public class CameraController : MonoBehaviour
     private void UnnecessaryBullshit()
     {
         drone.rotation = Quaternion.Euler(transform.rotation.x * -1, transform.rotation.y * -1, transform.rotation.z * -1);
+    }
+
+    private void SlowMotion()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Time.timeScale = _slowMotionFactor;
+        }
+        
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            Time.timeScale = 1f;
+        }
+        
     }
 
 }

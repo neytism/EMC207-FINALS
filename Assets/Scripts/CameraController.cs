@@ -82,11 +82,13 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Time.timeScale = _slowMotionFactor;
+            UIManager.Instance.ToggleSlowVignette(true);
         }
         
         if (Input.GetKeyUp(KeyCode.Space))
         {
             Time.timeScale = 1f;
+            UIManager.Instance.ToggleSlowVignette(false);
         }
         
     }

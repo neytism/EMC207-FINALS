@@ -24,6 +24,24 @@ public class GameManager : MonoBehaviour
             _instance = this;
             DontDestroyOnLoad(this);
             _allUnits = FindObjectsOfType<Units>();
+            
+            int teamACount = 0;
+            int teamBCount = 0;
+        
+            foreach (var unit in _allUnits)
+            {
+                if (unit.team == Units.Team.TeamA && unit.isAlive)
+                {
+                    teamACount++;
+                }
+            
+                if (unit.team == Units.Team.TeamB && unit.isAlive)
+                {
+                    teamBCount++;
+                }
+            }
+            
+            UIManager.Instance.SetTotalTeamCount(teamACount,teamBCount);
         }
         else
         {
@@ -81,6 +99,8 @@ public class GameManager : MonoBehaviour
             }
         }
         
+        UIManager.Instance.UpdateTeamHealth(teamACount,teamBCount);
+        
         Debug.Log("Team A left: " + teamACount + " Team B left: " + teamBCount);
 
         if (teamACount <= 0)
@@ -113,6 +133,8 @@ public class GameManager : MonoBehaviour
             _topBar.DOScaleY(1, 2);
             _bottomBar.DOScaleY(1, 2);
             _winnerText.DOFade(1, 2);
+            
+            UIManager.Instance.HideHud();
         }
     }
 }
